@@ -1,0 +1,15 @@
+print("HELLO WORLDINO")
+import serial
+ser0=serial.Serial('/dev/ttyACM0',9600,timeout=1)
+ser1=serial.Serial('/dev/ttyACM1',9600,timeout=1)
+ser2=serial.Serial('/dev/ttyACM2',9600,timeout=1)
+ser2.writelines('source:apply:square\n')
+ser1.writelines('*IDN?\n')
+print('AMC0 ' + ser0.readline())
+print('ACM1 ' + ser1.readline())
+print('ACM2 ' + ser2.readline())
+
+ser0.close()
+ser1.close()
+ser2.close()
+print("HELLO END")
