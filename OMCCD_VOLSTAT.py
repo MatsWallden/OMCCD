@@ -39,18 +39,6 @@ del portList[portList.index(serAFG.port)] #REMOVES THE OPENED PORT FROM THE LIST
 freq_PWM=90 # HZ
 pi=pigpio.pi() #CREATES OBJECT FOR HARDWARE PWM
 pid=PID(0.1,0.1,0.0) #creats a PID object
-##serARD=serial.Serial(portList[0],9600,timeout=0.5)
-##
-##serARD.flushInput()
-##serARD.flushOutput()
-##serARD.readlines()
-##
-##print("WAITING FOR VOLUMEACTUATOR")
-##while serARD.inWaiting()==0:
-##    pass
-##
-##bla=serARD.readline()
-##print(bla.rstrip())
 
 print("CONFIGURING THE GDS")
 serGDS.flushInput()
@@ -82,7 +70,8 @@ data_index_start=14 #
 data_index_end=8014 #8014 max
 n=numpy.arange(0.0,len(data)) #INDEX FOR UNPACKED FORMATTED DATA
 omega_excite=2*numpy.pi*freq_excite #ANGULAR VEOLCITY OF THE EXCITATION
-Sexp=26840869.9357 # This is the setpoint for the signal
+
+Sexp=1702000.0 # This is the setpoint for the signal
 
 print("FIRST LOOP")
 while True:
@@ -110,29 +99,18 @@ while True:
  
     H_excite=numpy.sum(numpy.multiply(data,numpy.exp(-1j*omega_excite*n*time_interval)))#FREQUENCY RESPONSE AT THE EXCITATION FREQUENCY
     S=abs(H_excite)**2/time_interval #MAGNITUDE ACCORDING TO PARSEVALS THEOREM
-    S=S/Sexp
+    Snorm=S/Sexp
     #output=pid(-0.1)
-    output=pid(1.0-S)
-    #S=S/10
-    
+    output=pid(1.0-Snorm)
+    #print(Snorm)
+    S=S/10
+    if(S>1000000):
+        S=999999
     #pi.hardware_PWM(18,freq_PWM,S)
-    #print(1.0-S)
-    print(output)
-##    #print(serARD.readlines())
-##    serARD.flushInput()
-##    serARD.flushOutput()
-##    print(str(S))
-##    serARD.write(str(S))
-##    
-##    #while serARD.inWaiting()==0:
-##        #pass
-##    serialComWaitForData(serARD,10000000)
-##    bla02=serARD.readline().rstrip()
-##    print(bla02)
-##    if bla02:
-##        print(bla02)
-##    else:
-##        print("FAILURE TO READ")
+    #print(1.0-Snorm)
+    print(S)
+    #print(output)
+
             
     
 
