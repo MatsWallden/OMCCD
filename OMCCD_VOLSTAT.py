@@ -106,7 +106,7 @@ while True:
     S=S/10
     if(S>1000000):
         S=999999
-    #pi.hardware_PWM(18,freq_PWM,S)
+    pi.hardware_PWM(18,freq_PWM,output)
     #print(1.0-Snorm)
     print(S)
     #print(output)

@@ -50,7 +50,7 @@ void setup() {
   pinMode(pinDirectionB, OUTPUT); //CH B -- HIGH = forwards and LOW = backwards???
   pinMode(pinGoA,OUTPUT);
   pinMode(pinGoB,OUTPUT);
-  /*
+  
   Serial.println("RANGING");
   ranged=getRange();//SENSE THE RANGE, MOVE DOWNWARDS TO EXTREMUS, UPWARD TO EXTREMUS
   
@@ -61,7 +61,7 @@ void setup() {
   
   while(!moved){} //WAIT UNTIL IN POSITION
   
-  Serial.println("READY");*/
+  Serial.println("READY");
  }
 
 void loop(){
@@ -71,7 +71,7 @@ void loop(){
     newPos=floor((input/10000)*(posMax-posMin)); //FIX ME MUST DEAL WITH ADDED RANGE STUFF
     
     Serial.print(" new position is "); Serial.println(newPos);
-   /* if(abs(newPos-posCounter)>limMove){
+  /* if(abs(newPos-posCounter)>limMove){
      
       moved=goToPosition(newPos);
       while(!moved){} //MAKES THE PROGRAM WAIT FOR THE MOVED BE CARRIED OUT"
