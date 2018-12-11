@@ -12,6 +12,7 @@ from struct import unpack_from
 from serialComWaitForData import serialComWaitForData
 from serialComGWGDS1072AUgetPotScale import serialComGWGDS1072AUgetPotScale
 from serialComGWGDS1072AUgetPotOffset import serialComGWGDS1072AUgetPotOffset
+from serialComGWGDS1072AUgetTimeScale import serialComGWGDS1072AUgetTimeScale
 from serialComGetPortGWGDS1072AU import serialComGetPortGWGDS1072AU
 from serialComGetPortGWAFG2005 import serialComGetPortGWAFG2005
 from serialComConfigurePort2018MAY16a import serialComConfigurePort2018MAY16a
@@ -45,7 +46,8 @@ serGDS.flushInput()
 
 #PARAMETERS FOR THE GDS 1072A-U
 ch=2 #SELECT CHANNEL ON THE GDS 1072AU USING THIS VARIABLE
-potentialScale=2.0e-04 #THE POTENTIAL SCALE FOR THE GDS IN VOLTS
+#potentialScale=2.0e-04 #THE POTENTIAL SCALE FOR THE GDS IN VOLTS
+potentialScale=float(serialComGWGDS1072AUgetPotScale(serGDS,2))
 potentialOffset=0.0 #THE OFFSET IN VOLTS
 probe=0 #THE PROBE  ATTENUATION 0=1x,1=10X
 probeType=0 #THE PROBE TYPE 0=VOLTAGE,1=CURRENT
@@ -61,8 +63,8 @@ serGDS.writelines(':CHANnel2:MATH 0\n') #TURNS MATH OPTION OFF FOR CHANNEL
 serGDS.writelines(':CHANnel2:Probe 0\n') # SETS THE PROBE ATTENTUATION 0=1x, 1=10x (DIDNT WORK)
 serGDS.writelines(':CHANnel2:Probe:Type '+str(probeType)+'\n') # SETS THE PROBE ATTENTUATION 0=1x, 1=10x
 serGDS.writelines(':CHANnel2:Probe:ratio '+ probeRatio +'\n') # SETS THE PROBE ATTENUATION FACTOR
-serGDS.writelines(':CHANnel2:SCALe '+str(potentialScale)+'\n') # SETS THE VERTICAL SCALE
-serGDS.writelines(':CHANnel2:offset '+str(potentialOffset)+'\n') #SETS THE OFFSET 
+#serGDS.writelines(':CHANnel2:SCALe '+str(potentialScale)+'\n') # SETS THE VERTICAL SCALE
+#serGDS.writelines(':CHANnel2:offset '+str(potentialOffset)+'\n') #SETS THE OFFSET 
 
 serialComWaitForGWGDS1072AcqStatus(serGDS,ch) # WAIT S FOR DEVICE TO BE READY TO ACQUIRE
 data=numpy.zeros(4000) #CONTAINER FOR DATA
@@ -71,9 +73,9 @@ data_index_end=8014 #8014 max
 n=numpy.arange(0.0,len(data)) #INDEX FOR UNPACKED FORMATTED DATA
 omega_excite=2*numpy.pi*freq_excite #ANGULAR VEOLCITY OF THE EXCITATION
 
-Sexp=1702000.0 # This is the setpoint for the signal
-
-print("FIRST LOOP")
+Sexp=1.0# This is the setpoint for the signal
+#y=numpy.array((1,))
+print("ENTERING LOOP")
 while True:
     ##SEND A VALUE AND SEE IF IT COMES BACK
     serGDS.writelines(':ACQ'+str(ch)+':LMEM?\n') #INSTRUCTION TO THE GDS TO ACQUIRE WAVEFORM DATA
@@ -89,7 +91,7 @@ while True:
 
     time_interval0=unpack_from('>f',x1,6) #UNPACKS THE BYTES ASSOCIATED WITH THE TIME INTERVAL!
     time_interval=time_interval0[0]#EXTRACTS THE TIME INTERVAL
-   
+       
     index_data=0 #INDEX FOR UNPACKED AND FORMATTED DATA
     for data_index in range(data_index_start,data_index_end,2):
         z=unpack_from('>h',x1,data_index) #UNPACKS A SHORT INTEGER FROM THE DATA
@@ -98,24 +100,21 @@ while True:
         index_data+=1
  
     H_excite=numpy.sum(numpy.multiply(data,numpy.exp(-1j*omega_excite*n*time_interval)))#FREQUENCY RESPONSE AT THE EXCITATION FREQUENCY
-    S=abs(H_excite)**2/time_interval #MAGNITUDE ACCORDING TO PARSEVALS THEOREM
-    Snorm=S/Sexp
+    #S=abs(H_excite)**2/time_interval #MAGNITUDE ACCORDING TO PARSEVALS THEOREM
+    S=abs(H_excite)   
+    #Snorm=S/Sexp
     #output=pid(-0.1)
-    output=pid(1.0-Snorm)
-    #print(Snorm)
-    S=S/10
-    if(S>1000000):
-        S=999999
-    pi.hardware_PWM(18,freq_PWM,output)
-    #print(1.0-Snorm)
-    print(S)
-    #print(output)
-
+    #output=pid(1.0-Snorm)
+    output=pid(S-Sexp)
+    print(output)
+    #pi.hardware_PWM(18,freq_PWM,output)
+    
+    #y=numpy.append(y,abs(H_excite))
+    #print(y[10:-1].std())
             
     
 
 
-#scal=serialComGWGDS1072AUgetPotScale(serGDS,2) #GET THE POTENTIAL SCALE
 #print(scal)
 
 #offs=serialComGWGDS1072AUgetPotOffset(serGDS,2)
