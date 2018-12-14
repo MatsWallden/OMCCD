@@ -1,6 +1,6 @@
 
 //LIBRARIES
-//#include "PID_v1.h"
+#include "PID_v1.h"
 
 // PINS
 const int pinPosLim=7;
@@ -16,10 +16,10 @@ int posMin=10;      //THIS IS THE LOWEST POSITION UNDER NORMAL OPERATION
 int posMax=1280;    //THIS IS THE HIGHEST POSITION UNDER NORMAL OPERATION
 int posLimLo=0;     //THIS IS THE LOWEST POSITION BEFORE THE MOTOR BREAKS
 int posLimHi=1291;  //THIS IS THE HIGHEST POSITION BEFORE THE MOTOR BREAKS
-//double Kp=0.05;
-//double KI=0.05;
-//double KD=0.01;
-//double setPoint=120.0; //TEST AGAINST A DROP OF X µL FIRST
+double Kp=0.05;
+double KI=0.05;
+double KD=0.01;
+double setPoint=120.0; //TEST AGAINST A DROP OF X µL FIRST
 double posInitial=200; //THE INITIAL POSITION
 int limMove=2; //HOW MANY STEPS DIFFERENT THAN LAST BEFORE MOVING? 
 double a=0.0; //DUMMY
@@ -34,14 +34,14 @@ bool goDirA=false;
 bool goDirB=true; //THIS IS NOT REQUIRED
 int posCounter=1;
 double input=100.0;
-//double output;
+double output;
 double newPos=0;
-//PID myPID(&input, &output, &setPoint,Kp,KI,KD, DIRECT);
+PID myPID(&input, &output, &setPoint,Kp,KI,KD, DIRECT);
 String message="";
 
 void setup() {
   Serial.begin(9600);
-  //myPID.SetMode(AUTOMATIC);
+  myPID.SetMode(AUTOMATIC);
   
   Serial.println("SETTING PINS");
   pinMode(pinPWM,INPUT); //SETS PIN TO INPUT FOR PWM 
@@ -50,7 +50,7 @@ void setup() {
   pinMode(pinDirectionB, OUTPUT); //CH B -- HIGH = forwards and LOW = backwards???
   pinMode(pinGoA,OUTPUT);
   pinMode(pinGoB,OUTPUT);
-  
+  /*
   Serial.println("RANGING");
   ranged=getRange();//SENSE THE RANGE, MOVE DOWNWARDS TO EXTREMUS, UPWARD TO EXTREMUS
   
@@ -61,17 +61,18 @@ void setup() {
   
   while(!moved){} //WAIT UNTIL IN POSITION
   
-  Serial.println("READY");
+  Serial.println("READY");*/
  }
 
 void loop(){
     moved=false;
-    input=pulseIn(pinPWM,HIGH); //READS SIGNAL AS PWM
+    input=pulseIn(pinPWM,HIGH)/1000; //READS SIGNAL AS PWM
     Serial.print(" input is "); Serial.println(input);
-    newPos=floor((input/10000)*(posMax-posMin)); //FIX ME MUST DEAL WITH ADDED RANGE STUFF
-    
-    Serial.print(" new position is "); Serial.println(newPos);
-  /* if(abs(newPos-posCounter)>limMove){
+    myPID.Compute();
+    newPos=floor((output)*(posMax-posMin)); //FIX ME MUST DEAL WITH ADDED RANGE STUFF
+    Serial.print(" output is ");Serial.println(output);
+   //Serial.print(" new position is "); //Serial.println(newPos);
+  /*if(abs(newPos-posCounter)>limMove){
      
       moved=goToPosition(newPos);
       while(!moved){} //MAKES THE PROGRAM WAIT FOR THE MOVED BE CARRIED OUT"

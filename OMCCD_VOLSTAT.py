@@ -21,7 +21,8 @@ from serialComIsDeviceARDVOLACTUATOR import serialComIsDeviceARDVOLACTUATOR
 from serialComGetPortARDVOLACTUATOR import serialComGetPortARDVOLACTUATOR
 from serialComGetPorts import serialComGetPorts
 import sys
-from pid_controller.pid import PID
+#from pid_controller.pid import PID
+#from simple_pid import PID as PID2
 sys.path.append('/home/pi/PIGPIO')
 
 
@@ -39,7 +40,8 @@ del portList[portList.index(serAFG.port)] #REMOVES THE OPENED PORT FROM THE LIST
 
 freq_PWM=90 # HZ
 pi=pigpio.pi() #CREATES OBJECT FOR HARDWARE PWM
-pid=PID(0.1,0.1,0.0) #creats a PID object
+#pid=PID(0.1,0.1,0.0) #creats a PID object
+#pid2=PID2(0.1,0.1,0.0,setpoint=1.0)
 
 print("CONFIGURING THE GDS")
 serGDS.flushInput()
@@ -74,7 +76,6 @@ n=numpy.arange(0.0,len(data)) #INDEX FOR UNPACKED FORMATTED DATA
 omega_excite=2*numpy.pi*freq_excite #ANGULAR VEOLCITY OF THE EXCITATION
 
 Sexp=1.0# This is the setpoint for the signal
-#y=numpy.array((1,))
 print("ENTERING LOOP")
 while True:
     ##SEND A VALUE AND SEE IF IT COMES BACK
@@ -94,21 +95,28 @@ while True:
        
     index_data=0 #INDEX FOR UNPACKED AND FORMATTED DATA
     for data_index in range(data_index_start,data_index_end,2):
-        z=unpack_from('>h',x1,data_index) #UNPACKS A SHORT INTEGER FROM THE DATA
+        try:
+            z=unpack_from('>h',x1,data_index) #UNPACKS A SHORT INTEGER FROM THE DATA
+        except:
+            print("WHY?")
         z1=float(z[0])#EXTRACTS THE INTEGER AND CONVERTS TO A FLOAT
         data[index_data]=(z1/127.0)*(5*potentialScale) #PROBERATIO AND SETTING ON THE TIPS!!!
         index_data+=1
  
     H_excite=numpy.sum(numpy.multiply(data,numpy.exp(-1j*omega_excite*n*time_interval)))#FREQUENCY RESPONSE AT THE EXCITATION FREQUENCY
     #S=abs(H_excite)**2/time_interval #MAGNITUDE ACCORDING TO PARSEVALS THEOREM
-    S=abs(H_excite)   
+    S=abs(H_excite)*100000  
     #Snorm=S/Sexp
     #output=pid(-0.1)
     #output=pid(1.0-Snorm)
-    output=pid(S-Sexp)
-    print(output)
-    #pi.hardware_PWM(18,freq_PWM,output)
-    
+    #output=pid(Sexp-S)
+    #output2=pid2(S)
+    #print(output)
+    #print(output2)
+    if S>=1000000:
+        S=999999
+    pi.hardware_PWM(18,freq_PWM,S)
+    print(S)
     #y=numpy.append(y,abs(H_excite))
     #print(y[10:-1].std())
             
