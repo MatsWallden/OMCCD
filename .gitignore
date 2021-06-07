@@ -1,3 +1,8 @@
+#VSCODE
+.vscode
+Python-3.8.0
+*.ino
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
