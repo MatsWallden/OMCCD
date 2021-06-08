@@ -2,10 +2,10 @@
 """
 import serial
 from serial_com.get_port_sequence import get_port_sequence
-from serial_com.get_port_gwgds1072au import get_port_gwgds1072au
+from serial_com.get_serial_gwgds1072au import get_serial_gwgds1072au
 from serial_com.is_device_gwgds1072au import is_device_gwgds1072au
 from serial_com.set_autoset_gwgds1072au import set_autoset_gwgds1072au
-THE_SERIAL=get_port_gwgds1072au(a_port_sequence=get_port_sequence())
+THE_SERIAL=get_serial_gwgds1072au(a_port_sequence=get_port_sequence())
 def test_set_autoset_gwgds1072_00():
     """[summary]
     """
