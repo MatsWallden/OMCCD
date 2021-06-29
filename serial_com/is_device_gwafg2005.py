@@ -4,9 +4,10 @@ AUTHOR: MATS WALLDEN
 EMAIL: mats@wallden.eu
 """
 import re #IMPORTS REGULAR EXPRESSIONS MODULE
+import serial
 from serial_com.wait_for_data import wait_for_data #FIX ME HARDCODED PATH
 
-def is_device_gwafg2005(obj : 'serial.Serial')  -> bool:
+def is_device_gwafg2005(obj : serial.serialposix.Serial)  -> bool:
     """[summary]
     the function is used to ascertain if a device is an gwinstek arbritrary function generator of type AFG2005
     Args:

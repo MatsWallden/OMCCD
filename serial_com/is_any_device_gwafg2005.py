@@ -2,7 +2,7 @@
 """
 from serial_com.is_device_gwafg2005 import is_device_gwafg2005
 import serial
-def is_any_device_gwafg2005(a_port_sequence: list): 
+def is_any_device_gwafg2005(a_port_sequence: list)->bool: 
     """[summary]
 
     Args:
