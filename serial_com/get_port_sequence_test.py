@@ -7,7 +7,9 @@ def test_get_port_sequence_00():
     """[summary]
     default case
     """
-    actual =get_port_sequence()
+    actual = get_port_sequence()
 
-    assert not actual is None
-
+    assert isinstance(actual,list)
+    assert len(actual)==2
+    assert '/dev/ttyACM0' in actual
+    assert '/dev/ttyACM1' in actual
