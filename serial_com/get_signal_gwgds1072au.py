@@ -20,7 +20,8 @@ def get_signal_gwgds1072au(a_signal_packed: bytes, a_scale : float ) -> list:
     n=4
     bla=0
     blb=bla+n
-
+    print(the_signal_packed)
+    JX=unpack('>%sh' % 2 ,the_signal_packed[bla:blb])
     for ii in range(0,2003):
         the_info.append(unpack('>%sh' % 2 ,the_signal_packed[bla:blb])[0])
         bla=bla+n
